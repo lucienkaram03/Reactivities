@@ -22,23 +22,37 @@ namespace API.Controllers
         // creation of endpoints
         [HttpGet] //api/activities someone how goanna use this route will reach this endpoint
         // now specifying whats going inside the response body 
-        public  async Task<ActionResult<List<Activity>>> GetActivities()
+        public  async Task<ActionResult<List<Activity>>> GetActivities() //task returns a list of activities.
         { // the response to the http request is nor then a list from activity 
-          return await Mediator.Send(new List.Query()) ;// we returned from the database instance that navigate into the database the list of activities needed and mentionned by the route.
-        } //our API controller is sending a request via our go between mediator to our application project, the we are returning the list to the API via also this mediator, all in one
+          return await Mediator.Send(new List.Query()) ;
+        } //our API controller is sending a request via our go between mediator to our application project, then we are returning the list to the API via also this mediator, all in one
+        //The Mediator.Send() method sends a request to the application's business logic. In this case, it's sending a query to retrieve the list of activities by invoking List.Query().
+//List.Query is likely a class that represents the request to get all the activities from the database.
         // accesing the data requested to the API by id primary key this time
+
+
+
+
         [HttpGet("{id}")] //api/activities/ certain Id
         public  async Task<ActionResult<Activity>> GetActivity(Guid id)
         {
             return await Mediator.Send(new Details.Query{Id = id}); // specifiing that we want the activity with that id that was requested****
             // the mediator used have to be saved in the program class main
 } // Id = id we are calling the set method of the property ID and changing its value by the one given as parameter
+
+
+
+
         [HttpPost] //used to create resources
         public async Task<ActionResult> CreateActivity(Activity activity)
          { // activity is the activity created.
-         await Mediator.Send(new Create.Command {Activity=activity}); //sending a request to a single  handler (in this case it is a command handler) to add the activity to memory.
+         await Mediator.Send(new Create.Command {Activity=activity}); //This Mediator.Send() send a requests to the application buisness logic, in this case it is sending a command to add an activity to the list of activities.
            return Ok() ;
         }
+
+
+
+
         [HttpPut("{id}")] //used to edit resources
         public async Task<ActionResult> EditActivity(Guid id, Activity activity){ //in parameter here, activity is the new one that we want to update.
 
@@ -49,7 +63,7 @@ namespace API.Controllers
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActivity(Guid id){
-          await Mediator.Send(new Delete.Command{Id=id});
+          await Mediator.Send(new Delete.Command{Id=id});// this Mediator.send() sends a requets to the application buonssme logic (comminacation between the api and apllication),this request is a command to delete an activity
           return Ok();
         }
         }

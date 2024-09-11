@@ -1,5 +1,5 @@
 
-// working with objects
+// working with objects, the interface defines structure of an object.
  export interface Duck{
     name: string ;
     numLegs: number;

@@ -10,7 +10,8 @@ namespace Application.Activities
     public class Delete
     {
         public class Command :IRequest {
-        public Guid Id { get; set; } //ID OF THE ACTIVITY THAT WE WANT TO DELETE
+        public Guid Id { get; set; } //ID OF THE ACTIVITY THAT WE WANT TO DELETE 
+        //we can took the activity itself as we did in the create class but here we are learning new things.
         }
         
 
@@ -19,7 +20,7 @@ namespace Application.Activities
         private readonly DataContext _context;
             public Handler(DataContext context)
             {
-            _context = context;
+            _context = context;//This means that the Handler class now has access to the database through _context, and it can use this to interact with the database, connection established.
             }
 
             public async Task Handle(Command request, CancellationToken cancellationToken)

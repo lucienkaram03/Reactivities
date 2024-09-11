@@ -1,4 +1,4 @@
-using System;
+//USED IN ACTIVITIES CONTROLLER
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,7 +19,7 @@ namespace Application.Activities
         private readonly DataContext _context;
             public Handler(DataContext context)
             {
-            _context = context;
+            _context = context;//This means that the Handler class now has access to the database through _context, and it can use this to interact with the database.
             }
 
             public async Task<Activity> Handle(Query request, CancellationToken cancellationToken)
