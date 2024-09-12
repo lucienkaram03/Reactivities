@@ -14,9 +14,10 @@ interface Props {
     closeForm:() => void;
     createorEdit:(activity : Activity) => void;
     deleteActivity : (id : string) => void;
+    submitting : boolean
 
 }
-export default function ActivityDashboard({activities, selectedActivity, 
+export default function ActivityDashboard({activities, selectedActivity, submitting,
     selectActivity, cancelSelectActivity , editMode,openForm,closeForm, createorEdit , deleteActivity } : Props) { 
     return (
           <Grid>
@@ -32,7 +33,11 @@ export default function ActivityDashboard({activities, selectedActivity,
         ))}
       </List>*/}  
  
-   <ActivityList activities={activities} selectActivity={selectActivity} deleteActivity={deleteActivity} /> {/* just by adding this line, we jump into the activityList file which is a child of activity dashboard . So the select activity function we actually need to pass down to our activities list.*/}
+   <ActivityList
+    activities={activities}
+     selectActivity={selectActivity} 
+     deleteActivity={deleteActivity}
+     submitting = {submitting} /> {/* just by adding this line, we jump into the activityList file which is a child of activity dashboard . So the select activity function we actually need to pass down to our activities list.*/}
 
             </Grid.Column>
             <Grid.Column width ='6'>
@@ -45,7 +50,7 @@ export default function ActivityDashboard({activities, selectedActivity,
                /> }{/*So what I'll do is I'll just hard code in one of the activities and we'll just access the activity index of zero just so that we've got something to look at in our component. && is used to verify that our activties element exist*/}
                {/* we want to create a card and present the details of our selected activity, so it have to be present in the ActivtyDetails */}
                {editMode &&
-            <ActivityForm closeForm={closeForm} activity={selectedActivity} createorEdit={createorEdit} />} {/* when we are in edit mode we want to display our activity so we put &&editmode with activty={selectedactivity} */}
+            <ActivityForm closeForm={closeForm} activity={selectedActivity} createorEdit={createorEdit} submitting={submitting} />} {/* when we are in edit mode we want to display our activity so we put &&editmode with activty={selectedactivity} */}
 
             </Grid.Column>
           </Grid>

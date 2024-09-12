@@ -1,3 +1,4 @@
+import { SyntheticEvent, useState } from "react";
 import { Button, Item, Label, Segment } from "semantic-ui-react";
 import { Activity } from "../../../app/models/activity";
 
@@ -5,10 +6,17 @@ interface Props {
     activities : Activity[] ;
     selectActivity : (id : string ) => void;
     deleteActivity:(id : string ) => void;
+    submitting: boolean;
+    
 }
 
-export default function ActivityList( {activities,selectActivity,deleteActivity} : Props) {
-
+export default function ActivityList( {activities,deleteActivity,submitting} : Props) {
+ const [target , setTarget] = useState(' ')// this state will contain the name of the button
+ function handleActivityDelete(e :SyntheticEvent<HTMLButtonElement>, id : string) { //e is the event that we are retreiving from the button
+  setTarget(e.currentTarget.name) ;  //targeting the name of the event and then deleting it 
+  deleteActivity(id) ; //and then deleting it 
+ }
+ 
 return(
     <Segment>
         <Item.Group divided>
@@ -23,9 +31,15 @@ return(
                             <div>{activity.city},{activity.venue}</div>
                         </Item.Description>
                         <Item.Extra>
-                            <Button onClick={() => selectActivity(activity.id)} floated='right' content='View' color='blue' /> {/* when we click on view button we select an activity , so it is a must that the selectActivity function have to be present in the button */}
+                            <Button onClick={(e) => handleActivityDelete(e, activity.id)} floated='right' content='View' color='blue' /> {/* when we click on view button we select an activity , so it is a must that the selectActivity function have to be present in the button */}
                             <Label basic content ={activity.category} />
-                            <Button onClick={() => deleteActivity(activity.id)} floated='right' content='Delete' color='red' />
+                            <Button
+                            name={activity.id}
+                             loading={submitting && target === activity.id} 
+                             onClick={() => deleteActivity(activity.id)} 
+                             floated='right'
+                             content='Delete'
+                             color='red' />
                         </Item.Extra>
                     </Item.Content>
                 </Item>

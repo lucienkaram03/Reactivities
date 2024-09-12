@@ -1,10 +1,12 @@
 
-import axios from 'axios';
+
 import { useEffect, useState } from 'react';
 import { Container } from 'semantic-ui-react';
 import { v4 as uuid } from 'uuid';
 import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
+import agent from '../api/agent';
 import { Activity } from '../models/activity';
+import LoadingComponent from './LoadingComponents';
 import NavBar from './navbar';
 
 
@@ -18,10 +20,20 @@ function App() { // this is our app component  //
 
   const[selectedActivity, setSelectedActivity] = useState<Activity | undefined> (undefined) ;// epecting to save an activity in the user state, this activity can be undifeined and the initial state is undefined.
   const[editMode,setEditMode] = useState(false) ; //used to edit or create activities using the form
+  const [loading,setLoading] = useState(true) ; // state or hook function used to set if there is a loading or not
+  const[submitting, setSubmitting] = useState(false);
+
 useEffect(() => {
-  axios.get<Activity[]>('http://localhost:5000/api/activities')
-  .then(response => { // after this promise, we get response which is the response of the Axios, which is an Activity array from the activity.ts model
-    setActivities(response.data) //we get the data of the response, which is of type activity array
+  //axios.get<Activity[]>('http://localhost:5000/api/activities') INSTEAD.
+  agent.Activities.list().then(response => { // after this promise, we get response which is the response of the Axios, which is an Activity array from the activity.ts model
+    const activities: Activity[] = []; //new array of type activities
+    response.forEach(activity => {
+      activity.date = activity.date.split('T')[0]; // we will split the text based on the T type with takimg the first part of the date [0] thats mean that we dont take the time clk imformation
+      activities.push(activity); 
+    })
+    setActivities(activities); //we are getting the list of activities from axios that go in the port 5000 of the db, and then storimg it in our activities state
+    // WE are setting now the new array which display the date as its real type with the given data
+    setLoading(false)
   })
    //this the fetch that happened using axios, we are getting activities from this url, this is a promise.
 },[] ) //this empty array ensure the one dependency that the useEffect hook have, it is recomanded, dependecies are also contained inside an array, one dependecy means that the useEffect is only callled once
@@ -49,21 +61,70 @@ function handleFormClose() { {/* when we will goanna create an activity , not ed
 }
 
 function handleCreateOrEditActivity(activity: Activity) { // THIS ONE GOES THE DEEPER AN REALLY EDIT THE ACTIVITY AND PUT IT IN THE BOTTOM OF THE LIST
+  setSubmitting(true); //as we want to submit our activity, and start our loading indicators
+
+
+
+
+
+
+
+// THIS IF ELSE IS WITH USING THE REQUEST OF OUR API MANAGED BY AXIOS, SO WE WILL HAVE CONNECTION WITH THE BACKEND, WE ARE USING OUR AGENT FILE
+
+
+
+
+
+  if(activity.id ) { //if the activity exist. 
+   agent.Activities.update(activity).then(() => {
+    setActivities([...activites.filter(x=>x.id !== activity.id) ,activity])  //we are selecting the activity from the activities array with a different id and edit it by replacing it by the activity given in parameter.
+    // this line of code do the necessary update. the spread operrator ... is used to take all the current elements of the activities array and spread them into a new array. This creates a shallow copy of the original activities array., x holds the activity fetched from the activity array
+    setSelectedActivity(activity);
+    setEditMode(false)
+    setSubmitting(false)
+    
+   })
+  }
+  else { //in case of creating an activity
+
+    activity.id = uuid(); //the function uuid is generating a unique id and giving it to activity.id 
+    agent.Activities.create(activity).then(() => {
+    setActivities([...activites,{...activity}])
+    })
+    setSelectedActivity(activity);
+    setEditMode(false);
+    setSubmitting(false)
+
+      
+  }
+
+
+
+
+// THIS IF ELSE IS WITH USING THE NORMAL REACT APP WITHOUT ACCESSING THE BACKEND, WITHOUT THE USE OF API, DOING IT LOCALLY NOW WE WILL NOT USE IT ANYMORE
+
+
+/*
   if(activity.id ) // if the id exist, than we are editimg the activity 
   setActivities([...activites.filter(x=>x.id !== activity.id) ,activity])
-  else setActivities([...activites,{...activity, id:uuid()}]) // in case when create an activity when the id doesnt exist, and also in vid 57 we generated a new id for our new activity, this activity created will be set in the activities array that we spreaded
+  else setActivities([...activites,{...activity, id:uuid()}]) // in case when create an activity when the id doesnt exist, and also in vid 57 we generated a new id for our new activity, this activity created will be set in the activities array that we spreaded ,{ ...activity, id: uuid() } creates a new object with all the properties of activity, but also assigns a unique id to it (using uuid()).
   setEditMode(false);
   setSelectedActivity(activity); //then we create our activity
 
-    //we are selecting the activity from the activities array with a different id and edit it by replacing it by the activity given in parameter.
-  // this line of code do the necessary update. the spread operrator ... is used to loop over our exisiting activities, x holds the activity fetched from the activity array
+   */
   
 }
 
 function handleDeleteActivity(id : string) {
-  setActivities({...activites.filter(x => x.id !==id)}) //as lucien I understand it that we did not give a second parameter to the setactivities, then we are replacing the activity with the specified id by nothing, which is DELETING this activity.
+  setSubmitting(true)
+  agent.Activities.delete(id).then(() => {
+    setActivities({...activites.filter(x => x.id !==id)}) //as lucien I understand it that we did not give a second parameter to the setactivities, then we are replacing the activity with the specified id by nothing, which is DELETING this activity.
+    setSubmitting(false) ;
+  })
+  
 
 }
+if(loading) return <LoadingComponent content='Loading app' />
 
   return( // what the client is really seeing now, 
     <div>
@@ -79,6 +140,7 @@ function handleDeleteActivity(id : string) {
       closeForm={handleFormClose}
       createorEdit={handleCreateOrEditActivity}
       deleteActivity={handleDeleteActivity}
+      submitting={submitting}
 
       /> {/*ivityDashboard is a child from the app componenet, it is contained inside the app compnent  */}
 
@@ -110,5 +172,6 @@ export default App
   // duck in map(duck=>) refers that we are working with every duck in the array, it is the parameter of type Duck
   // finally, we integrate our component in this react app, aiming for our objective of react architechture. by the last line of code we breaked things up with components
   
+
 
 
