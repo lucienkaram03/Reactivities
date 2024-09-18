@@ -1,4 +1,4 @@
-//this will contain all our request to the API, we are centralizing all the API request in that file
+//this will contain all our request to the API, we are centralizing all the API request in that file, insuring the connection to the API.
 import axios, { AxiosResponse } from 'axios';
 import { Activity } from '../models/activity';
 
@@ -34,7 +34,7 @@ const requests = { // we are doing a single object for all the crud operations, 
 const Activities = {
     list : () => requests.get<Activity[]>('/activities') ,//  this is a request to go and list all the activities, whatever we put in the url it goanna be our base url, and also we will goanna go into our response data.
     // we are precising what is the type of our data that we are frtchig 
-    details: (id : string) => requests.get<Activity[]>(`/activities'/${id}`), //this one is for getting the details when we create an activity and saving it in the server, we are getting an activity with a specific ID
+    details: (id : string) => requests.get<Activity >(`/activities'/${id}`), //this one is for getting the details when we create an activity and saving it in the server, we are getting an activity with a specific ID
     create:(activity : Activity) => requests.post<void>(`/activities` , activity ), //we are sending this activity to the port 5000, 
     update :(activity : Activity) => requests.put<void>( `/activities/${activity.id}`, activity), //we are editing the activity with the SPECIFIC ID by replacing it by our activity paraneter
     delete: (id : string) =>requests.del<void>(`/activities/${id}`),
