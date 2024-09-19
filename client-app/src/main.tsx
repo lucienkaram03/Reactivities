@@ -1,9 +1,8 @@
+import '.app/layout/styles.css';
 import { StrictMode } from 'react';
+import 'react-calendar/dist/Calendar.css';
 import { createRoot } from 'react-dom/client';
 import 'semantic-ui-css/semantic.min.css'; // importing the reference of our semantic design for our app
-
-import '.app/layout/styles.css';
-import 'semantic-ui-css/semantic.min.css';
 import { store, StoreContext } from './app/stores/store';
 
 import { RouterProvider } from 'react-router-dom';

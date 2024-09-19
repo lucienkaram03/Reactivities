@@ -27,6 +27,18 @@ export default class ActivityStore {
         return Array.from(this.activityRegistry.values()).sort((a,b) =>  //.values present all the list of activities
         Date.parse(a.date) - Date.parse(b.date)) ; // to not broke our app, we will sort our activities by their dates
     }
+    get groupedActivities () { //name of our array of objects
+        return Object.entries ( //array of objects
+            this.activitiesByDate.reduce((activities, activity) => { //we are takimg the activities date array and we are reducing it to an object.
+                // in parameter it is taking the array of activities and the actvivty in it.
+                // we are doing this call back function on each element of this array.
+                const date = activity.date; //this goanna be our id
+               activities[date] = activities[date] ? [...activities[date] , activity] : [activity] ;//we will get the property inside activities that macthes that date, veryfing if we have a macth between this activity with this date,
+               return activities ;                                                     //[activity] creating an new array with that activity.
+
+            }, {} as {[key : string] : Activity[]}) //{} reprents that we have an object now insted of an array
+        )
+    }
     loadActivities = async () => { // this function loads the activties as we did in the App.tsx with the use of agent.Activities, nut now in the "store" behaviore         ,automatically bounded into the class above, we used async await because we used promises.
         this.loadingInitial = true; 
         this.loadingInitial = true ; //specifying the ptoperty of the Mobx Class
