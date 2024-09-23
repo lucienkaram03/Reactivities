@@ -17,6 +17,7 @@ export default function NavBar(/*{openForm}:Props*/){ //this is a component that
                 <img src="/assets/logo.png" alt="logo" style={{marginRight: '10px'}} /> Reactivities {/* logo is the legend of the image that we are using */}
             </Menu.Item>
             <Menu.Item as = {NavLink} to ='/activities' name='Activities' />
+            <Menu.Item as = {NavLink} to ='/errors' name='Errors' />
             <Menu.Item>
                 <Button as= {NavLink} to='/createactivity'positive content ='Create Activity' />{/* positive content made them green , we are opening a form to create our activity */}
             </Menu.Item>

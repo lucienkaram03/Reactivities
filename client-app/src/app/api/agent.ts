@@ -1,6 +1,9 @@
 //this will contain all our request to the API, we are centralizing all the API request in that file, insuring the connection to the API.
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+import { toast } from 'react-toastify';
 import { Activity } from '../models/activity';
+import { router } from '../router/Routes';
+import { store } from '../stores/store';
 
 const sleep = (delay : number) => {
     return new Promise((resolve) => { //resolve means that we will  resolve this promise in the future asynchronesly ,
@@ -12,14 +15,58 @@ const sleep = (delay : number) => {
 axios.defaults.baseURL = 'http://localhost:5000/api/activities'  ;//this is a base url so  that for every request it uses this particular url to search inside
 // getting response back from the API,
 axios.interceptors.response.use(async response => { //interceptor is like breakpoints, with async is more beaitiful
-    try {
+    
         await sleep(1000); //wait to sleep for 1000 ms
         return response;
-    } catch (error) {
-        console.log(error);
-        return await Promise.reject(error);
+    
+}, (error : AxiosError) => { // we are getting back an error from our API
+    const {status, data, config } = error.response as AxiosResponse ; // we are getting data and status from our response
+    switch (status) { //This is the status that we get back from our response.
+        case 400 :
+            if(config.method === 'get' && Object.prototype.hasOwnProperty.call(data.errors, 'id')) {
+                router.navigate('/not-found') ; //what they used here wasnt a valid guid, if we have a data errors prop with the id, then we have a bad guid
+            }
+           if (data.errors) { //when hitting validation error. 
+            const modalStateErrors = [] ; //empty array
+            for (const key in data.errors) { // 
+                if(data.errors[key]) {
+                    modalStateErrors.push(data.errors[key]) //then we will have a single array of stings
+                }
+            }
+            throw modalStateErrors.flat() ; // we will have tahnan array of strings for each individual error
+      
+           
+
+
+           } else {
+            toast.error(data) ; //shoqwing just the string when hiitng the bad request button
+        }
+
+
+            break;  
+            //case 400 is a bad request
+          case 401:
+            toast.error('Unauthorized')
+         break;
+          case 403:
+            toast.error('Forbidden') 
+            break ;
+            case 404:
+               router.navigate('/not-found') //rooting our notfound file into the case were we have a not found
+                break ;
+                case 500:
+                    store.commonStore.setServerError(data) ;
+                    router.navigate('/server-error') ;
+                    break;
+         default:
+           break;
     }
-})
+
+return Promise.reject(error) ; //that will pass the error back to the component that was calling the method that caused this particular error as well.
+
+
+
+}) //what we are getting back is an error.
 
 
 const responseBody =<T> (response : AxiosResponse<T>) => response.data ; //this responsebody holds the response of data, this is the stuff that we are intersted in.

@@ -1,8 +1,11 @@
-import { createBrowserRouter, RouteObject } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouteObject } from "react-router-dom";
 import ActivityDashboard from "../../features/activities/dashboard/ActivityDashboard";
 import ActivityDetails from "../../features/activities/Details/ActivityDetails";
 import ActivityForm from "../../features/activities/form/ActivityForm";
 //import HomePage from "../../features/home/HomePage";
+import NotFound from "../../features/errors/NotFound";
+import ServerError from "../../features/errors/ServerError";
+import TestErrors from "../../features/errors/TestError";
 import App from "../layout/App";
 
 
@@ -19,8 +22,11 @@ export const routes: RouteObject[] = [ //This code tells the app: "When a user v
         {path: 'activities' , element: <ActivityDashboard/>},// localhost:3000/activivties
         {path: 'activities/:id' , element: <ActivityDetails/>}, //when clicking on the view button. selecting an activity knowing its id ad displaying its details, here id is a route parameter
         {path: 'CreateActivity' , element: <ActivityForm key ="create"/>}, // localhost:3000/createActivity
-        {path : 'manage/:id' , element : <ActivityForm key="manage"/>}, //this path is used to navigate to the activity form to edit the activity with its id.
-
+       // {path : 'manage/:id' , element : <ActivityForm key="manage"/>}, //this path is used to navigate to the activity form to edit the activity with its id.
+       {path : 'errors' , element :<TestErrors  />}, //naivgate to our error page
+       {path : 'not-found' , element :<NotFound  />}, 
+       {path: '*' , element: <Navigate replace to = '/not-found' />}, //we mean by star the error happened by a mistake url
+       {path : 'server-error' , element :<ServerError />}, 
     ]
 
 }

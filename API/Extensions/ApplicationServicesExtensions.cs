@@ -1,6 +1,8 @@
 // to have a clearer and better project, we just created a class detictated to application services that were located in program.cs
 using Application.Activities;
 using Application.Core;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -23,7 +25,8 @@ services.AddCors(opt => { // this is our policy
 });
 services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler).Assembly)); //saving our mediator that we created in the List class, all of them will be registred
 services.AddAutoMapper(typeof(MappingProfiles).Assembly); //assembly is used to locate all of the mapping profiles that we are using in our project.
-
+services.AddFluentValidationAutoValidation(); //adding the auto validation
+services.AddValidatorsFromAssemblyContaining<Create>();
 return services;
  }   
     }

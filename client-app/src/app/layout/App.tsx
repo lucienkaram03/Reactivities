@@ -7,11 +7,13 @@ import { Container } from 'semantic-ui-react';
 //import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
 
 import { Outlet, useLocation } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import HomePage from '../../features/home/HomePage';
 import NavBar from './navbar';
 
 
-function App() { // this is our app component  //
+function App() { // this is our app component  
+
 const location = useLocation() ; //this will give us the path of what's inside the URL, as in which route has the user gone to, then we have to check regardlimg two conditions if we will have to go the home page or the childrens
 
 
@@ -145,6 +147,8 @@ const location = useLocation() ; //this will give us the path of what's inside t
 
   return( // what the client is really seeing now, 
     <div>
+      <ToastContainer position = 'bottom-right' hideProgressBar theme ='colored'/>
+      {/* we want our toast notification for errors  to be available for every componet, so we will put it in the top */}
       {location.pathname === '/' ? <HomePage /> : ( //else we go to the childrens in our outlet.
         <div>
       <NavBar /*openForm={handleFormOpen}*//> {/* we want to add the openForm to the navbar where our create activity button is created */}

@@ -1,6 +1,8 @@
 
 // since we updated our application, we should know updated the API
+using System.Reflection.Metadata;
 using Application.Activities;
+using Application.Core;
 using Domain;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -22,9 +24,14 @@ namespace API.Controllers
         // creation of endpoints
         [HttpGet] //api/activities someone how goanna use this route will reach this endpoint
         // now specifying whats going inside the response body 
-        public  async Task<ActionResult<List<Activity>>> GetActivities() //task returns a list of activities.
+        public  async Task<IActionResult> GetActivities() //task returns a list of activities.
         { // the response to the http request is nor then a list from activity 
-          return await Mediator.Send(new List.Query()) ;
+         // return await Mediator.Send(new List.Query()) ;
+
+
+         return HandleResult( await Mediator.Send(new List.Query()) ) ; //know we are carrying about the errorhandling
+
+
         } //our API controller is sending a request via our go between mediator to our application project, then we are returning the list to the API via also this mediator, all in one
         //The Mediator.Send() method sends a request to the application's business logic. In this case, it's sending a query to retrieve the list of activities by invoking List.Query().
 //List.Query is likely a class that represents the request to get all the activities from the database.
@@ -34,20 +41,24 @@ namespace API.Controllers
 
 
         [HttpGet("{id}")] //api/activities/ certain Id
-        public  async Task<ActionResult<Activity>> GetActivity(Guid id)
+        public  async Task<IActionResult> GetActivity(Guid id) //IAction results we are returning hhtp responses
         {
-            return await Mediator.Send(new Details.Query{Id = id}); // specifiing that we want the activity with that id that was requested****
+            var result = await Mediator.Send(new Details.Query{Id = id}); // specifiing that we want the activity with that id that was requested****
             // the mediator used have to be saved in the program class main
-} // Id = id we are calling the set method of the property ID and changing its value by the one given as parameter
+ // Id = id we are calling the set method of the property ID and changing its value by the one given as parameter
+        /// if(activity == null) return NotFound(); //becasue null will give a 204 response
 
+  //else return activity;
 
+return HandleResult(result); //
+}
 
 
         [HttpPost] //used to create resources
-        public async Task<ActionResult> CreateActivity(Activity activity)
+        public async Task<IActionResult> CreateActivity(Activity activity)
          { // activity is the activity created.
-         await Mediator.Send(new Create.Command {Activity=activity}); //This Mediator.Send() send a requests to the application buisness logic, in this case it is sending a command to add an activity to the list of activities.
-           return Ok() ;
+         return HandleResult(await Mediator.Send(new Create.Command {Activity=activity})); //This Mediator.Send() send a requests to the application buisness logic, in this case it is sending a command to add an activity to the list of activities.
+           
         }
 
 
@@ -57,14 +68,14 @@ namespace API.Controllers
         public async Task<ActionResult> EditActivity(Guid id, Activity activity){ //in parameter here, activity is the new one that we want to update.
 
           activity.Id = id; //we are updatimg the id of activity in case there was not an Id
-          await Mediator.Send(new Edit.Command{Activity=activity}) ;// sending a request to the handler to edit the activity entity.
-          return Ok();
+          return HandleResult(await Mediator.Send(new Edit.Command{Activity=activity})) ;// sending a request to the handler to edit the activity entity.
+          
 
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActivity(Guid id){
-          await Mediator.Send(new Delete.Command{Id=id});// this Mediator.send() sends a requets to the application buonssme logic (comminacation between the api and apllication),this request is a command to delete an activity
-          return Ok();
+          return HandleResult(await Mediator.Send(new Delete.Command{Id=id}));// this Mediator.send() sends a requets to the application buonssme logic (comminacation between the api and apllication),this request is a command to delete an activity
+          
         }
         }
         
