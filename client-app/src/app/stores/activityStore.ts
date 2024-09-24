@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { makeAutoObservable, runInAction } from "mobx";
 import { v4 as uuid } from 'uuid';
 import agent from "../api/agent";
@@ -8,7 +9,7 @@ export default class ActivityStore {
    selectedActivity : Activity | undefined = undefined ;
    editMode = false;
    loading = false;    //this is a list of observable states.
-   loadingInitial = false; // this is the loading logo that we are putting in.
+   loadingInitial = true; // this is the loading logo that we are putting in.
    // now we will apply our reduction of codes that we want to from Mobx, replacing the big amount of code concerning the states in the App.tsx code
 
 
@@ -25,14 +26,14 @@ export default class ActivityStore {
     
     get activitiesByDate() {
         return Array.from(this.activityRegistry.values()).sort((a,b) =>  //.values present all the list of activities
-        Date.parse(a.date) - Date.parse(b.date)) ; // to not broke our app, we will sort our activities by their dates
+        a.date!.getTime() - b.date!.getTime()) ; // to not broke our app, we will sort our activities by their dates
     }
     get groupedActivities () { //name of our array of objects
         return Object.entries ( //array of objects
             this.activitiesByDate.reduce((activities, activity) => { //we are takimg the activities date array and we are reducing it to an object.
                 // in parameter it is taking the array of activities and the actvivty in it.
                 // we are doing this call back function on each element of this array.
-                const date = activity.date; //this goanna be our id
+                const date = format (activity.date! , 'dd MM yyy h:mm aa') //we want the activity name so we use the Tostring to let it be
                activities[date] = activities[date] ? [...activities[date] , activity] : [activity] ;//we will get the property inside activities that macthes that date, veryfing if we have a macth between this activity with this date,
                return activities ;                                                     //[activity] creating an new array with that activity.
 
@@ -40,7 +41,7 @@ export default class ActivityStore {
         )
     }
     loadActivities = async () => { // this function loads the activties as we did in the App.tsx with the use of agent.Activities, nut now in the "store" behaviore         ,automatically bounded into the class above, we used async await because we used promises.
-        this.loadingInitial = true; 
+        this.loadingInitial = false; 
         this.loadingInitial = true ; //specifying the ptoperty of the Mobx Class
         
         try {
@@ -98,8 +99,9 @@ export default class ActivityStore {
          
     }
     private setActivity =(activity : Activity) => {
-        activity.date = activity.date.split('T')[0]; // we will split the text based on the T type with takimg the first part of the date [0] thats mean that we dont take the time clk imformation
+        //activity.date = activity.date.split('T')[0]; // we will split the text based on the T type with takimg the first part of the date [0] thats mean that we dont take the time clk imformation
         //this.activities.push(activity); // here we are mutating our states in Mobx, we had an empty array initially in the class, and then we are pushing activities inside it
+        activity.date = new Date(activity.date!); // new Date we are giving the type javascript to the date, this is what we want also
         this.activityRegistry.set(activity.id , activity) ;
     }
 

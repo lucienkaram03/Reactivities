@@ -1,5 +1,9 @@
 {
   "dependencies": {
-    "react-router-dom": "^6.26.2"
+    "react-router-dom": "^6.26.2",
+    "yup": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/yup": "^0.29.14"
   }
 }
