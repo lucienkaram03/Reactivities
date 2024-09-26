@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace Persistence
 {
-    public class DataContext:DbContext //DataContext is the Class that let us connect to the DataBase.
+    public class DataContext:IdentityDbContext<AppUser> //DataContext is the Class that let us connect to the DataBase.
     {
         public DataContext(DbContextOptions options) :base(options){ //giving the data base option to an element
 

@@ -1,12 +1,36 @@
 
 using Domain;
+using Microsoft.AspNetCore.Identity;
 
 namespace Persistence
 {
     public class Seed
     {
-        public static async Task SeedData(DataContext context)
+        public static async Task SeedData(DataContext context , UserManager<AppUser> userManager) //usermanager is used to manage our users
         {
+
+         if(!userManager.Users.Any()) { //if our list of users in store is empty
+
+            var users = new List<AppUser>{ //now we will seed our DB
+
+                new AppUser{DisplayName ="Bob", UserName="bob" , Email="bob@test.com"},
+                new AppUser{DisplayName ="Tom", UserName="tom" , Email="tom@test.com"},
+                new AppUser{DisplayName ="Jane", UserName="jane" , Email="jane@test.com"},
+
+            };
+
+            foreach(var user in users){
+
+                await userManager.CreateAsync(user, "Pa$$w0rd"); //creating a password for the users
+            }
+         }
+
+
+
+
+
+
+
             if (context.Activities.Any()) return;
             
             var activities = new List<Activity> //name of the table in our database , creating a new list of type activity.
