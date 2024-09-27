@@ -52,13 +52,17 @@ public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto) { //t
 
     if(await _userManager.Users.AnyAsync(x => x.UserName == registerDto.Username))
     {
-        return BadRequest("User name is already taken");
+        ModelState.AddModelError("usename" , "User Name taken") ; //email as a key, email taken as the value, the error is then displayed in this format
+         //we are giving the error more deeply from the API
+        return ValidationProblem();
     }
 
      if(await _userManager.Users.AnyAsync(x => x.Email== registerDto.Email)) //we did it twice because we dont want a clear response
     {
-        return BadRequest("Email is already taken");
-    }
+         ModelState.AddModelError("email" , "Email taken") ; //email as a key, email taken as the value, the error is then displayed in this format
+         //we are giving the error more deeply from the API
+        return ValidationProblem(); //this is our final code concerning the validation error
+    } 
 
     var user = new AppUser { //now we will register
         

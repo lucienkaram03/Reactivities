@@ -2,6 +2,7 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 import { Activity } from '../models/activity';
+import { User, UserFormValues } from '../models/user';
 import { router } from '../router/Routes';
 import { store } from '../stores/store';
 
@@ -13,6 +14,17 @@ const sleep = (delay : number) => {
 
 
 axios.defaults.baseURL = 'http://localhost:5000/api/activities'  ;//this is a base url so  that for every request it uses this particular url to search inside
+
+const responseBody =<T> (response : AxiosResponse<T>) => response.data ; //this responsebody holds the response of data, this is the stuff that we are intersted in.
+axios.interceptors.request.use(config => {
+const token = store.commonStore.token;
+if(token && config.headers) config.headers.Authorization = `Bearer ${token}` ;
+return config;
+
+})
+
+
+
 // getting response back from the API,
 axios.interceptors.response.use(async response => { //interceptor is like breakpoints, with async is more beaitiful
     
@@ -69,7 +81,7 @@ return Promise.reject(error) ; //that will pass the error back to the component 
 }) //what we are getting back is an error.
 
 
-const responseBody =<T> (response : AxiosResponse<T>) => response.data ; //this responsebody holds the response of data, this is the stuff that we are intersted in.
+
 
 const requests = { // we are doing a single object for all the crud operations, it store all the request of our activities
     get: <T> (url : string) => axios.get<T>(url).then(responseBody), // getting  from axios
@@ -86,8 +98,20 @@ const Activities = {
     update :(activity : Activity) => requests.put<void>( `/activities/${activity.id}`, activity), //we are editing the activity with the SPECIFIC ID by replacing it by our activity paraneter
     delete: (id : string) =>requests.del<void>(`/activities/${id}`),
 }
+
+const Account = { //our specific method to connect to our API concerning to login , register and get the current user
+
+    current: () => requests.get<User>('/account'), //return type is a user
+    login: (user: UserFormValues) => requests.post<User>('/account/login', user), //this method take as a parameter the values from the form, and from these values it return the user with this info from the url below.
+    register: (user: UserFormValues) => requests.post<User>('/account/register', user), 
+
+
+}
+
+
+
 const agent = {
-        Activities
+        Activities, Account //insuring the connection to the API through this agent while using the methods inside activities and account
     }
     
    export default agent; // exporting it to use our list of activities in other files.

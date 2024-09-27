@@ -6,6 +6,7 @@ import ActivityForm from "../../features/activities/form/ActivityForm";
 import NotFound from "../../features/errors/NotFound";
 import ServerError from "../../features/errors/ServerError";
 import TestErrors from "../../features/errors/TestError";
+import LoginForm from "../../features/users/LoginForm";
 import App from "../layout/App";
 
 
@@ -27,6 +28,8 @@ export const routes: RouteObject[] = [ //This code tells the app: "When a user v
        {path : 'not-found' , element :<NotFound  />}, 
        {path: '*' , element: <Navigate replace to = '/not-found' />}, //we mean by star the error happened by a mistake url
        {path : 'server-error' , element :<ServerError />}, 
+       {path : 'login' , element :<LoginForm />}, 
+       {path: 'manage/:id' , element: <ActivityForm key='manage' />},
     ]
 
 }

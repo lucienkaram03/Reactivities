@@ -1,22 +1,35 @@
 
-
+//152
 import { observer } from 'mobx-react-lite';
 
 
 import { Container } from 'semantic-ui-react';
 //import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
 
+import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import HomePage from '../../features/home/HomePage';
+import { useStore } from '../stores/store';
+import LoadingComponent from './LoadingComponents';
 import NavBar from './navbar';
 
 
 function App() { // this is our app component  
 
 const location = useLocation() ; //this will give us the path of what's inside the URL, as in which route has the user gone to, then we have to check regardlimg two conditions if we will have to go the home page or the childrens
+const {commonStore , userStore} = useStore() ;
 
+useEffect(()  => {
+if (commonStore.token) { //checking if we have a token in the commonstore
 
+  userStore.getUser().finally(() => commonStore.setApploaded()) //After gettinmg  our current user, we persist 
+}
+else commonStore.setApploaded()
+
+}, [commonStore , userStore]) 
+
+if(!commonStore.apploaded) return <LoadingComponent content="Loading app..."
 
 //we removed all of these const {activityStore} = useStore ();
     // const{selectedActivity, editMode} = activityStore; 

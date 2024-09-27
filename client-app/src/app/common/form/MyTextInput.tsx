@@ -5,6 +5,7 @@ interface Props{ //model for our input field
     placeholder : string;
     name : string; 
     label?: string;
+    type ?: string ;
 }
 export default function MyTextInput(props : Props) {
 
