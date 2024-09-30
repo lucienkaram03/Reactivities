@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Core;
+using Application.Interfaces;
 using Domain;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 namespace Application.Activities
@@ -30,13 +32,25 @@ public CommandValidator() {
         public class Handler : IRequestHandler<Command, Result<Unit>> //Handler class is the class that perform an operation related to Activities in a database.
         {
         private readonly DataContext _context;
-            public Handler(DataContext context ) 
+        private readonly IUserAccessor _userAccessor;
+            public Handler(DataContext context, IUserAccessor userAccessor ) 
             {
+            _userAccessor = userAccessor; 
             _context = context; //This means that the Handler class now has access to the database through _context, and it can use this to interact with the database.
             }
 
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
+              var user = await _context.Users.FirstOrDefaultAsync(x => 
+              x.UserName == _userAccessor.GetUsername()); //this will give us access to our user object
+
+              var attendee  = new ActivityAttendee { //fisrt atttende of our activity is the host
+
+                AppUser = user ,
+                Activity = request.Activity,
+                IsHost = true
+              }; 
+
                 _context.Activities.Add(request.Activity); //this line of code add an activity to the memory(Activities Table), we ddidnt touch the DB (we are just adding on it,)so we don't need to use the asynchronous version of Add, we are adding it inside our DB context so no need to delve and search in the DB
              var result =   await _context.SaveChangesAsync() > 0;//savimg changes
              if(!result) return Result<Unit>.Failure("Failed to create activity");

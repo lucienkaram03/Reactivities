@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import HomePage from '../../features/home/HomePage';
+import ModalContainer from '../common/modals/modalContainer';
 import { useStore } from '../stores/store';
 import LoadingComponent from './LoadingComponents';
 import NavBar from './navbar';
@@ -29,7 +30,7 @@ else commonStore.setApploaded()
 
 }, [commonStore , userStore]) 
 
-if(!commonStore.apploaded) return <LoadingComponent content="Loading app..."
+if(!commonStore.apploaded) return <LoadingComponent content="Loading app..." />
 
 //we removed all of these const {activityStore} = useStore ();
     // const{selectedActivity, editMode} = activityStore; 
@@ -160,6 +161,7 @@ if(!commonStore.apploaded) return <LoadingComponent content="Loading app..."
 
   return( // what the client is really seeing now, 
     <div>
+      <ModalContainer />
       <ToastContainer position = 'bottom-right' hideProgressBar theme ='colored'/>
       {/* we want our toast notification for errors  to be available for every componet, so we will put it in the top */}
       {location.pathname === '/' ? <HomePage /> : ( //else we go to the childrens in our outlet.

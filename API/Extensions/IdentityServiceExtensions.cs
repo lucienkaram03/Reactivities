@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+
 using System.Text;
-using System.Threading.Tasks;
+
 using API.Services;
 using Domain;
+using Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
@@ -41,6 +41,17 @@ var key = new SymmetricSecurityKey (Encoding.UTF8.GetBytes(config["TokenKey"])) 
 
          };
          } );
+services.AddAuthorization(opt => { //creation of this policy
+opt.AddPolicy("IsActivityHost", policy => {
+policy.Requirements.Add(new IsHostRequirement()) ; //creating the policy to the host as a service
+
+}  ) ;
+
+});
+
+
+         services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>(); 
+        
          services.AddScoped<TokenService>(); //specifying that the token is scoped only in case of an http request
 
          return services;

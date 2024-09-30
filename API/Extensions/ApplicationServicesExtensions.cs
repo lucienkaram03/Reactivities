@@ -1,8 +1,10 @@
 // to have a clearer and better project, we just created a class detictated to application services that were located in program.cs
 using Application.Activities;
 using Application.Core;
+using Application.Interfaces;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -27,6 +29,8 @@ services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler)
 services.AddAutoMapper(typeof(MappingProfiles).Assembly); //assembly is used to locate all of the mapping profiles that we are using in our project.
 services.AddFluentValidationAutoValidation(); //adding the auto validation
 services.AddValidatorsFromAssemblyContaining<Create>();
+services.AddHttpContextAccessor() ; //addimg this srvice in our API
+services.AddScoped<IUserAccessor, UserAccessor>() ; //and this will make this available to be injected inside our application hankders, so we can really apply what we want and get the userName.
 return services;
  }   
     }

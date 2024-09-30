@@ -64,7 +64,7 @@ return HandleResult(result); //
 
 
 
-
+[Authorize(Policy = "IsActivityHost")]
         [HttpPut("{id}")] //used to edit resources
         public async Task<ActionResult> EditActivity(Guid id, Activity activity){ //in parameter here, activity is the new one that we want to update.
 
@@ -73,10 +73,18 @@ return HandleResult(result); //
           
 
         }
+        [Authorize(Policy = "IsActivityHost")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActivity(Guid id){
           return HandleResult(await Mediator.Send(new Delete.Command{Id=id}));// this Mediator.send() sends a requets to the application buonssme logic (comminacation between the api and apllication),this request is a command to delete an activity
           
+        }
+
+        [HttpPost("{id}/attend")]
+
+        public async Task<IActionResult> Attend(Guid id) //in the piont of vue of the API
+        {
+          return HandleResult(await Mediator.Send(new UpdateAttendence.Command{Id = id})) ;
         }
         }
         

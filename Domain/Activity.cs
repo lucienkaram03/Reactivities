@@ -1,9 +1,5 @@
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Threading.Tasks;
+
 namespace Domain
 {
     public class Activity
@@ -21,6 +17,11 @@ namespace Domain
       public string City {get;set;}
 
       public string Venue{get;set;}
+
+      public bool IsCancelled {get;set ;}
+
+    public ICollection<ActivityAttendee> Attendes {get ; set;} = new List<ActivityAttendee>(); //than we dont get a null reference when we attend this in postman
+
       
       
 
