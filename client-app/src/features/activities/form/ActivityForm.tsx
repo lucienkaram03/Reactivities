@@ -10,7 +10,7 @@ import MySelectInput from "../../../app/common/form/MySelectInput";
 import MyTextArea from "../../../app/common/form/MyTextArea";
 import MyTextInput from "../../../app/common/form/MyTextInput";
 import LoadingComponent from "../../../app/layout/LoadingComponents";
-import { Activity } from "../../../app/models/activity";
+import { ActivityFormValues } from "../../../app/models/activity";
 import { categoryOptions } from "../../../app/options/categoryOptions";
 import { useStore } from "../../../app/stores/store";
 
@@ -27,19 +27,11 @@ export default observer(function ActivityForm(/*{activity : selectedActivity ,cl
 
 
     const{activityStore} = useStore() ;
-    const{  loading, loadActivity, loadingInitial, createActivity,updateActivity} =activityStore;
+    const{  loadActivity, loadingInitial, createActivity,updateActivity} =activityStore;
    const {id} = useParams() ;
    const navigate = useNavigate() ; //using to navigate automaticcally to for example the activity that we created.
-   const[activity, setActivity] = useState<Activity >({ 
-    id: ' ',
-        title: ' ',
-        category: ' ',
-        description: ' ',
-        date: null, //it is no morer a string , then we give it null since we update the type to Date || null
-        city: ' ',
-        venue: ' ',
-
-   }) ; 
+   const[activity, setActivity] = useState<ActivityFormValues >(new ActivityFormValues());
+   
 
  
 const validationSchema = Yup.object({
@@ -56,7 +48,7 @@ date: Yup.string().required('The activity date is required').nullable(),
 
 
    useEffect(() => { //effect when the activity is loaded.
-       if(id) loadActivity(id).then(activity => setActivity(activity !))  //if the activity got from the useparams exist , we will load this activity an then set it in our registry.
+       if(id) loadActivity(id).then(activity => setActivity(new ActivityFormValues(activity)))  //if the activity got from the useparams exist , we will load this activity an then set it in our registry.
    }, [id,loadActivity]) //the loadActivity(id) is returning a promise of type void, we want it to return an activity, so lets update the load activity in the activitystore,
    
    
@@ -75,11 +67,13 @@ date: Yup.string().required('The activity date is required').nullable(),
 
     // const [activity, setActivity] = useState(initialState) ; //storimg this initial state in activity using set activity , initial state is its initial value.
  
-    function handleFormSubmit(activity : Activity) {  //this one is just used to process the submit of a form
-     if( !activity.id ) {
-        activity.id = uuid() ; //we created an activity.
-       createActivity(activity).then(() => navigate(`/activities/${activity.id}`)) //in this case we navigate automatically to the activity that we created, to do that we need an id
-       //createActivity gives us a promise, than we can use them.
+    function handleFormSubmit(activity : ActivityFormValues) {  //this one is just used to process the submit of a form
+     if( !activity.id ) { //if we dont have a activity id than we are creating one
+        const newActivity = {
+          ...activity ,
+          id: uuid()
+        };
+        createActivity(newActivity).then(() => navigate(`/activities/${newActivity.id}`))
    
      }  
     else updateActivity(activity).then(() => navigate(`/activities/${activity.id}`))//in this case we navigate automatically to the activity that we created, to do that we need an id
@@ -130,7 +124,7 @@ if(loadingInitial) return <LoadingComponent content=' LOADING ACTIVITY ...'  />
 disabled={isSubmitting || !dirty ||!isValid} 
 
 
-loading={loading} floated='right' positive type = 'submit' content='Submit'  value = {activity.title} name = 'title' /> {/* whe are givin the loading element the submitting if it is true or false to let the loading element displays */}
+loading={isSubmitting} floated='right' positive type = 'submit' content='Submit'  value = {activity.title} name = 'title' /> {/* whe are givin the loading element the submitting if it is true or false to let the loading element displays */}
 <Button as={Link} to='/activiies' floated='right' type = 'button' content='Cancel'  value = {activity.title} name = 'title' /> {/* onclick on cancel, we are closing the form after submitting it*/}
 </Form>
 )}

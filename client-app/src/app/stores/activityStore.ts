@@ -2,7 +2,9 @@ import { format } from "date-fns";
 import { makeAutoObservable, runInAction } from "mobx";
 import { v4 as uuid } from 'uuid';
 import agent from "../api/agent";
-import { Activity } from "../models/activity";
+import { Activity, ActivityFormValues } from "../models/activity";
+import { Profile } from "../models/profile";
+import { store } from "./store";
 export default class ActivityStore { 
    //activities: Activity[] = [] ;   //this is the list of activities that we are goanna store in our activity store, it is initiazied to an empty array
    activityRegistry = new Map<string , Activity>() ; //we are using now the mapping object, it takes as string which is the id and the activity wich is the object.
@@ -98,7 +100,19 @@ export default class ActivityStore {
         return this.activityRegistry.get(id) ; // we are getting an activity from our registry, if it is not found we go to our API
          
     }
-    private setActivity =(activity : Activity) => {
+    private setActivity =(activity : Activity) => { 
+        const user = store.userStore.user;
+if(user){
+    activity.isGoing = activity.attendees!.some( //checking if the user is going to an event as in they are in the attlist
+        a => a.username === user.username
+    )
+    activity.isHost =activity.hostUsername === user.username;
+    activity.host = activity.attendees?.find(x => x.username === activity.hostUsername);
+}
+
+
+
+
         //activity.date = activity.date.split('T')[0]; // we will split the text based on the T type with takimg the first part of the date [0] thats mean that we dont take the time clk imformation
         //this.activities.push(activity); // here we are mutating our states in Mobx, we had an empty array initially in the class, and then we are pushing activities inside it
         activity.date = new Date(activity.date!); // new Date we are giving the type javascript to the date, this is what we want also
@@ -124,11 +138,19 @@ export default class ActivityStore {
     // }
     //know we will create the functions related to create and updating an activity, removing them from App.tsx and focusing on them on the store function
 
-createActivity = async (activity: Activity) => {
-    this.loading = true ;
+createActivity = async (activity: Activity) => { //when creating this activity, we goanna add our user as an attendee to that activity, and is goanna be the host of this activity
+    const user = store.userStore.user;
+    const attendee = new Profile(user!);
     activity.id = uuid(); //same as before.
     try {
         await agent.Activities.create(activity) ; 
+        const newActivity = new Activity(activity);
+        newActivity.hostUsername = user!.username;
+        newActivity.attendees = [attendee] ;
+        this.setActivity(newActivity);
+        runInAction(() => {
+            this.selectedActivity = newActivity;
+        })
         runInAction(() => {  // we want the update of all the observable properties to happens at the same time in one single update.
             this.activityRegistry.set(activity.id, activity) ;
             this.selectedActivity = activity;
@@ -143,17 +165,22 @@ createActivity = async (activity: Activity) => {
     }
 }
 
-updateActivity = async(activity  :Activity) => {
-    this.loading = true; // that means that we let the load of the activity happens
+updateActivity = async(activity  :ActivityFormValues) => {
+   // this.loading = true; // that means that we let the load of the activity happens
 
     try {
 
         await agent.Activities.update(activity); //here activity is the one updated version of the activity that we want to edit 
         runInAction(() =>{ 
-            this.activityRegistry.set(activity.id , activity) ; // we are fetching the activity that we want to udpdate, the spread operate creates a new array and add the old array in it but where we have the updated version of that activity selected in it
-           this.selectedActivity = activity; 
-           this.editMode = false;
-           this.loading= false;
+            if (activity.id) {
+                const updatedActivity = {...this.getActivity(activity.id), ...activity}
+                this.activityRegistry.set(activity.id , updatedActivity as Activity) ;// we are fetching the activity that we want to udpdate, the spread operate creates a new array and add the old array in it but where we have the updated version of that activity selected in it
+                this.selectedActivity = updatedActivity as Activity; 
+            }
+
+            
+           
+        
 
 
 
@@ -162,9 +189,7 @@ updateActivity = async(activity  :Activity) => {
         
     } catch (error) {
         console.log(error) ; 
-        runInAction(() => {
-            this.loading = false; 
-        })
+       
     }
 }  
 
@@ -186,7 +211,49 @@ deleteActivity = async( id : string)=> {
     runInAction( () => {
         this.loading=false;}
     )
+   } }
+
+updateAttendance = async () => {
+    const user = store.userStore.user;
+    this.loading = true;
+    try {
+        await agent.Activities.attend(this.selectedActivity!.id);
+        runInAction(() => {
+            if(this.selectedActivity?.isGoing){
+                this.selectedActivity.attendees = 
+                this.selectedActivity.attendees?.filter(a => a.username !== user?.username); //getting the login user from the attendee array
+                this.selectedActivity.isGoing = false;
+            }else{
+                const attendee = new Profile(user!) ; // creating a new attendee
+                this.selectedActivity?.attendees?.push(attendee); //adding the new attendee to the list 
+                this.selectedActivity!.isGoing= true;
+            }
+
+            this.activityRegistry.set(this.selectedActivity!.id, this.selectedActivity!)
+        })
+    } catch (error) {
+        console.log(error)
+    } finally{
+        runInAction( () => this.loading = false);
+    }
    }
        
+cancelActivityToggle = async() => {
+
+    this.loading = true ;
+    try{
+        await agent.Activities.attend(this.selectedActivity!.id); //give the list of attendees for this selected activity.
+        runInAction(() => {
+            this.selectedActivity!. isCancelled = !this.selectedActivity?.isCancelled;
+            this.activityRegistry.set(this.selectedActivity!.id , this.selectedActivity!);
+        })
     }
 }
+
+
+
+
+
+
+
+    }
