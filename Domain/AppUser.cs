@@ -10,7 +10,7 @@ namespace Domain
 
         public ICollection<ActivityAttendee> Activities {get ; set;}
 
-
+public ICollection<Photo> Photos {get ;set ;} //this our one to many relationship 
 
 
     }

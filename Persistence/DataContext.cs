@@ -20,7 +20,7 @@ namespace Persistence
 
         public DbSet<ActivityAttendee> ActivityAttendees {get;set;}  //creation of this joint table in the database ,we have to create it
 
-
+public DbSet<Photo> Photos {get ; set;} //if we want to get our photo directly from our database
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);    //overrinding the onmodel creating method to create an entity of type ActivityAttendee

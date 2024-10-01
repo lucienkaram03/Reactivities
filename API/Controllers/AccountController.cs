@@ -29,7 +29,8 @@ namespace API.Controllers
 [HttpPost("login")] //endpoint to login to the application, it is url of the login
 public async Task<ActionResult<UserDto>> Login(LoginDto loginDto) {
 
-    var user = await _userManager.FindByEmailAsync(loginDto.Email) ; //fetching a user regardling its email
+    var user = await _userManager.Users.Include(p => p.Photos) 
+    .FirstOrDefaultAsync(x => x.Email == loginDto.Email); //fetching a user regardling its email with now involoving the list of photos
     
     if(user == null) return Unauthorized() ;
 
@@ -80,7 +81,7 @@ if(result.Succeeded){
     return new UserDto { //WE WANNA RETURN PROPERTIES GOOD BENEFITS TO THE USER
 DisplayName = user.DisplayName,
 Token= _tokenService.CreateToken(user),
-Image = null,
+Image = user?.Photos?.FirstOrDefault(x => x.IsMain)?.Url, //getting the image of the user
 Username = user.UserName
 
     };
@@ -93,7 +94,8 @@ return BadRequest(result.Errors);
 
 public async Task<ActionResult<UserDto>> GetCurrentUser() 
 {
-    var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email)); //that goigng to take the email claim from the token that is presented to the API
+    var user = await _userManager.Users.Include(p => p.Photos)
+    .FirstOrDefaultAsync(x => x.Email == User.FindFirstValue(ClaimTypes.Email)); //that goigng to take the email claim from the token that is presented to the API
   //in the array of users User we are finding the fisrt email from the token wchich is the email of the Current user
   return CreateUserObject(user);
 

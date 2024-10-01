@@ -23,6 +23,6 @@ namespace Application.Activities
       
       public bool IsCancelled {get;set ;} //to let the host cancel the activity, not removing his name from it as an attendee
 
-      public ICollection<Profile> Attendees {get ; set;}
+      public ICollection<AttendeeDto> Attendees {get ; set;}
     }
 }

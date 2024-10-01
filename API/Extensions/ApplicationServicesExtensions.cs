@@ -4,6 +4,7 @@ using Application.Core;
 using Application.Interfaces;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Infrastructure.Photos;
 using Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -31,6 +32,8 @@ services.AddFluentValidationAutoValidation(); //adding the auto validation
 services.AddValidatorsFromAssemblyContaining<Create>();
 services.AddHttpContextAccessor() ; //addimg this srvice in our API
 services.AddScoped<IUserAccessor, UserAccessor>() ; //and this will make this available to be injected inside our application hankders, so we can really apply what we want and get the userName.
+services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
+services.AddScoped<IPhotoAccessor, PhotoAccessor>();
 return services;
  }   
     }
