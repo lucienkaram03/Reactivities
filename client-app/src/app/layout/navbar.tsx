@@ -30,7 +30,7 @@ const {userStore: {user , logout}} =useStore();
 
                 <DropdownMenu>
 
-                <DropdownItem as={Link} to ={`/profile/${user?.username}`} text = 'My profile' icon = 'power' />
+                <DropdownItem as={Link} to ={`/profiles/${user?.username}`} text = 'My profile' icon = 'power' />
                 <DropdownItem onClick={logout} text='logout' icon = 'power' />
                 </DropdownMenu>
 

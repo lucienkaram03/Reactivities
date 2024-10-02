@@ -60,4 +60,8 @@ getUser = async () => {  //we focused on the current user because we are persist
     }
 }
 
+setImage = (image : string) => {
+    if(this.user) this.user.image = image  ;
+}
+
 }

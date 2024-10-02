@@ -248,6 +248,11 @@ cancelActivityToggle = async() => {
             this.activityRegistry.set(this.selectedActivity!.id , this.selectedActivity!);
         })
     }
+    catch(error) {
+
+        console.log(error) ;
+
+    }
 }
 
 

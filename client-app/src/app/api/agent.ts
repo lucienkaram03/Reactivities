@@ -2,6 +2,7 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 import { Activity, ActivityFormValues } from '../models/activity';
+import { Photo, Profile } from '../models/profile';
 import { User, UserFormValues } from '../models/user';
 import { router } from '../router/Routes';
 import { store } from '../stores/store';
@@ -109,10 +110,24 @@ const Account = { //our specific method to connect to our API concerning to logi
 
 }
 
-
+//create an object to get the users profile from the API
+const Profiles = {
+    get : (username : string ) => requests.get<Profile>(`/profiles/${username}`), //getting the profile with the user photo as well
+    uploadPhoto: (file : Blob) => {
+        const formData = new FormData() ;
+        formData.append('File' , file) ;
+        return axios.post<Photo>('photos', formData, {
+            headers: {'Content-Type' : 'multipart/form-data'}
+        })
+    },
+    setMainPhoto: (id : string) =>requests.post(`/photos/${id}/setMain` , {}),
+    deletePhoto: (id : string) => requests.del(`/photos/${id}`)
+} 
 
 const agent = {
-        Activities, Account //insuring the connection to the API through this agent while using the methods inside activities and account
+        Activities, 
+        Account,
+        Profiles //insuring the connection to the API through this agent while using the methods inside activities and account
     }
     
    export default agent; // exporting it to use our list of activities in other files.
