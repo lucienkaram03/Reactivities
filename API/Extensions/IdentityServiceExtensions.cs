@@ -40,6 +40,27 @@ var key = new SymmetricSecurityKey (Encoding.UTF8.GetBytes(config["TokenKey"])) 
 
 
          };
+
+         opt.Events=new JwtBearerEvents 
+         {
+            OnMessageReceived = context => 
+            {
+                var accessToken = context.Request.Query["access_token"] ; //getting the token from this query string
+                var path = context.HttpContext.Request.Path; //if we are in the signalR route
+                if(!string.IsNullOrEmpty(accessToken)  && (path.StartsWithSegments("/chat"))     )  //if this matches the endpoints
+                {
+                    context.Token = accessToken; //we getted our token
+                }
+
+                return Task.CompletedTask ;
+
+            }
+            
+         };
+
+
+
+
          } );
 services.AddAuthorization(opt => { //creation of this policy
 opt.AddPolicy("IsActivityHost", policy => {

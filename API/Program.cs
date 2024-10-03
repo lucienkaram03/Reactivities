@@ -1,6 +1,7 @@
 using System.Net;
 using API.Extensions;
 using API.Middleware;
+using API.SignalR;
 using Application.Activities;
 using Application.Core;
 using Domain;
@@ -41,6 +42,7 @@ app.UseAuthentication(); //becomes before autorization, because we want to verif
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ChatHub>("/chat") ; //adding the root of our hub
 
 using var scope = app.Services.CreateScope();// intermediaire to access a service
 var services = scope.ServiceProvider;

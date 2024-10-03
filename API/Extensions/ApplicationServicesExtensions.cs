@@ -23,7 +23,13 @@ services.AddDbContext<DataContext>(opt =>
 });
 services.AddCors(opt => { // this is our policy
     opt.AddPolicy("CorsPlicy", policy => {
-    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost: 3000");
+    policy
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials() // then we ensure connection to signalR with the token required
+    .WithOrigins("http://localhost: 3000");
+
+
 });
 });
 services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler).Assembly)); //saving our mediator that we created in the List class, all of them will be registred
@@ -34,6 +40,7 @@ services.AddHttpContextAccessor() ; //addimg this srvice in our API
 services.AddScoped<IUserAccessor, UserAccessor>() ; //and this will make this available to be injected inside our application hankders, so we can really apply what we want and get the userName.
 services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
 services.AddScoped<IPhotoAccessor, PhotoAccessor>();
+services.AddSignalR();
 return services;
  }   
     }

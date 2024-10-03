@@ -3,6 +3,7 @@ import ActivityStore from "./activityStore.ts";
 import CommonStore from "./commonStore.ts";
 import UserStore from "./userStore.ts";
 
+import CommentStore from "./commentStore.ts";
 import ModalStore from "./modalStore.ts";
 import ProfileStore from "./ProfileStore.ts";
 
@@ -14,6 +15,7 @@ commonStore : CommonStore ; //we we store the rror for our server error
 userStore : UserStore;
 modalStore : ModalStore;
 profileStore : ProfileStore;
+commentStore : CommentStore;
 }
 
 export const store : Store = { //creating a big store of interface store.
@@ -21,7 +23,8 @@ export const store : Store = { //creating a big store of interface store.
     commonStore : new CommonStore(), //this is where we store our error when we went it back from our API
     userStore : new UserStore(),
     modalStore:new ModalStore(),
-    profileStore : new ProfileStore()
+    profileStore : new ProfileStore(),
+    commentStore : new CommentStore() 
 }
 
 export const StoreContext = createContext(store) ; //creating a react context for this store, the context that will let us get the properties needed for the component.

@@ -22,6 +22,8 @@ namespace Domain
 
     public ICollection<ActivityAttendee> Attendes {get ; set;} = new List<ActivityAttendee>(); //than we dont get a null reference when we attend this in postman
 
+    public ICollection<Comment> Comments {get ; set; } = new List<Comment>(); //comments for that specific activity
+
       
       
 

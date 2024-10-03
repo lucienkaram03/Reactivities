@@ -252,10 +252,14 @@ cancelActivityToggle = async() => {
 
         console.log(error) ;
 
+    } finally {
+        runInAction(() => this.loading = false) ;
     }
 }
 
-
+clearSelectedActivity = () => {
+    this.selectedActivity = undefined ; //when going from an activity to another in the front end, there is some dirty things from the previous activity, we want to remove them
+}
 
 
 

@@ -17,11 +17,12 @@ import ActivityDetailedSidebar from "./ActivityDetailedSidebar";
 }*/
 export default  observer (function ActivityDetails(/*{activity, cancelSelectActivity, openForm} : Props*/) {
   const{activityStore} = useStore() ; //telling each of our comppnent that we are using an activity from our store.
-  const{selectedActivity : activity, loadActivity, loadingInitial} = activityStore; //retreiving the observable data from the activityStore, making it in a easy way.
+  const{selectedActivity : activity, loadActivity, loadingInitial, clearSelectedActivity} = activityStore; //retreiving the observable data from the activityStore, making it in a easy way.
   const {id} = useParams() ; //the use params is the hook that fetch the id of the indidvidual activity
 
 useEffect(() => {
   if(id) loadActivity(id) ;
+  return() => clearSelectedActivity() ; //then we clean up our previous selected activity
 } , [id, loadActivity])
 
   if(loadingInitial || !activity) return <LoadingComponent/>; //veryfing of the activity is undefined
@@ -30,7 +31,7 @@ useEffect(() => {
       <Grid.Column width ={10}>
         <ActivityDetailedHeader activity={activity} />
         <ActivityDetailedInfo activity={activity}/>
-        <ActivityDetailedChat/>
+        <ActivityDetailedChat activityId ={activity.id}/>
       </Grid.Column>
 
       <Grid.Column width ={6} >

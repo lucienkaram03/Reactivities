@@ -1,4 +1,5 @@
 
+using System.Security.Cryptography.X509Certificates;
 using Domain;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -20,13 +21,15 @@ namespace Persistence
 
         public DbSet<ActivityAttendee> ActivityAttendees {get;set;}  //creation of this joint table in the database ,we have to create it
 
+        public DbSet<Comment> Comments {get ; set ;} //to query the comments to the database
+
 public DbSet<Photo> Photos {get ; set;} //if we want to get our photo directly from our database
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);    //overrinding the onmodel creating method to create an entity of type ActivityAttendee
 
             builder.Entity<ActivityAttendee>(x => x.HasKey(aa => new {aa.AppUserId , aa.ActivityId})); //we are giving a primary key of 2 id in our table.
-
+ // then we have our many to many realtionship builded
             builder.Entity<ActivityAttendee>()
             .HasOne(u => u.AppUser)  //building our one to many relationship btween app user and activities
             .WithMany(a => a.Activities)
@@ -36,8 +39,12 @@ public DbSet<Photo> Photos {get ; set;} //if we want to get our photo directly f
             .HasOne(a => a.Activity)  //building our one to many relationship btween activities and app user
             .WithMany(u => u.Attendes)
             .HasForeignKey(aa => aa.ActivityId) ;
+           
 
-            // then we have our many to many realtionship builded
+            builder.Entity<Comment>() 
+            .HasOne(a => a.Activity)
+            .WithMany(c => c.Comments)
+            .OnDelete(DeleteBehavior.Cascade) ; //an activity have many comments this is the relationship, when deleting an activity we atomatically delete its comments
 
 
     }
