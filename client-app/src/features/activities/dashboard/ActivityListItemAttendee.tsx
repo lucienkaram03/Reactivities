@@ -7,6 +7,14 @@ interface Props{
     attendees :Profile[];
 }
 export default observer(function ActivityListItemAttendee({attendees} : Props){ //creating our component of list of attendees to an activity
+
+const styles = {
+    borderColor : 'orange' ,
+    borderWidth : 2 
+}
+
+
+
 return (
 
     <List horizontal >
@@ -16,7 +24,12 @@ hoverable
 key={attendee.username} 
 trigger ={
     <List.Item key={attendee.username} as={Link} to={`/profiles/${attendee.username}`}> {/* then we automatically link into our attendee profiel */}
-            <Image size = 'mini' circular src = {attendee.image ||'/assets/user.png'} />
+            <Image size = 'mini'
+             circular src = {attendee.image ||'/assets/user.png'}
+             bordered
+             style = {attendee.following ? styles : null} // putting an orange border around the profile of the attendee if the user follows one of these attendees
+             
+             />
         </List.Item>
 }
 

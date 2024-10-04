@@ -42,7 +42,8 @@ if (!attendees) return null;
     <Item.Header as='h3'>
         <Link to={`/profiles/${attendee.username}`}>{attendee.displayName}</Link>
     </Item.Header>
-    <Item.Extra style={{ color: 'orange' }}>Following</Item.Extra>
+    {attendee.following && //very useful to put the word following if we are really following what we want
+    <Item.Extra style={{ color: 'orange' }}>Following</Item.Extra> }
 </Item.Content>
 </Item>
 

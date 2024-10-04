@@ -23,8 +23,10 @@ namespace Persistence
 
         public DbSet<Comment> Comments {get ; set ;} //to query the comments to the database
 
+        public DbSet<UserFollowing> UserFollowings {get ; set; } 
+
 public DbSet<Photo> Photos {get ; set;} //if we want to get our photo directly from our database
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder builder) //this one is for building the relationships
         {
             base.OnModelCreating(builder);    //overrinding the onmodel creating method to create an entity of type ActivityAttendee
 
@@ -45,6 +47,23 @@ public DbSet<Photo> Photos {get ; set;} //if we want to get our photo directly f
             .HasOne(a => a.Activity)
             .WithMany(c => c.Comments)
             .OnDelete(DeleteBehavior.Cascade) ; //an activity have many comments this is the relationship, when deleting an activity we atomatically delete its comments
+
+            builder.Entity<UserFollowing>(b => 
+            { //building the many to many relationship
+                b.HasKey(k => new {k.ObserverId , k.TargetId}) ;
+
+                b.HasOne(o => o.Observer)
+                .WithMany(f => f.Followings)
+                .HasForeignKey(o => o.Observer) 
+                .OnDelete(DeleteBehavior.Cascade); //when deleting a user the following tables of him are deleted also
+
+                  b.HasOne(o => o.Target)
+                .WithMany(f => f.Followers)
+                .HasForeignKey(o => o.Target) 
+                .OnDelete(DeleteBehavior.Cascade); //when deleting a user the following tables of him are deleted also
+
+
+            });
 
 
     }

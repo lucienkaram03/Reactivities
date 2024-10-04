@@ -262,7 +262,23 @@ clearSelectedActivity = () => {
 }
 
 
+//method to update the attendees in each activity that we have inside our registry 
+updateAttendeeFollowing = (username : string ) => {
+    this.activityRegistry.forEach(activity => {
+        activity.attendees?.forEach(attendee => {
+            if (attendee.username == username) { //the attendee that we want to follow
+                if(attendee.following) {
 
+                 attendee.followersCount -- ;
+                }
+                 else attendee.followersCount ++ ; 
+
+                attendee.following = !attendee.following ; // to update the following flag, if we already follow than we unfollow and vice versa
+
+            }
+        })
+    })
+}
 
 
     }

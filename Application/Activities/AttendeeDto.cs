@@ -14,5 +14,11 @@ namespace Application.Activities
         public string Image{ get; set; }
 
         public string Bio{ get; set; }
+
+         public bool Following {get ; set ;} // to now if the current logged in user when they return a current user profile is following this particular user profile
+
+        public int FollowersCount {get ; set ; }
+
+        public int FollowingCount {get ; set ;}
     }
 }

@@ -7,6 +7,7 @@ import { User, UserFormValues } from '../models/user';
 import { router } from '../router/Routes';
 import { store } from '../stores/store';
 
+
 const sleep = (delay : number) => {
     return new Promise((resolve) => { //resolve means that we will  resolve this promise in the future asynchronesly ,
         setTimeout(resolve, delay)
@@ -121,7 +122,11 @@ const Profiles = {
         })
     },
     setMainPhoto: (id : string) =>requests.post(`/photos/${id}/setMain` , {}),
-    deletePhoto: (id : string) => requests.del(`/photos/${id}`)
+    deletePhoto: (id : string) => requests.del(`/photos/${id}`),
+    updateProfile : (profile : Partial<Profile>) => requests.put(`/profiles/` , profile),
+    updateFollowing : (username : string) => requests.post(`/follow/${username}` , {}) , 
+    listFollowings: (username : string , predicate : string ) => //generate a list of followings for the user profile
+        requests.get<Profile[]>(`/follow/${username}?predicate=${predicate}`)
 } 
 
 const agent = {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Core;
+using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Domain;
@@ -25,13 +26,15 @@ namespace Application.Activities
             private readonly DataContext _context; // Application depends on persistence, this is why it is obligatory to created a DataContext object from persistence to delve into the DB, _context will be used to access and manipulate the database.
            //readonly element is used only to assign this element to a desired value, used typically in the constructor.
         private readonly IMapper _mapper;
+        private readonly IUserAccessor _userAccessor;
 
-            public Handler(DataContext context, IMapper mapper){ //through Data contex, we can interact with Activities Property to performe various database operation
+            public Handler(DataContext context, IMapper mapper , IUserAccessor userAccessor){ //through Data contex, we can interact with Activities Property to performe various database operation
+            _userAccessor = userAccessor;
             _mapper = mapper;
             // all the Handler instance created by this constrcutor will need a DataContext instance in parameter do they can connect to the DB.
                 _context = context; //This means that the Handler class now has access to the database through _context, and it can use this to interact with the database.
             }//
-            public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken cancellation) //what the handle method or function is returning a LIST of activities and it take a query request as an argument.
+            public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken cancellation ) //what the handle method or function is returning a LIST of activities and it take a query request as an argument.
             // to return this list of activities, we have to get it from the database, so we are going to inject DB context here to delve into the DB, so we create the constructor from header class
             {//return await _context.Activities.ToListAsync(); //then we are returning the data that we are looking for the list of activities 
                 // this task method wait for tolistAsync to fetch the desired data and then continue its task
@@ -44,7 +47,7 @@ namespace Application.Activities
                //instead of this type of query, we will use the projection which is more efficent
               
 
-.ProjectTo<ActivityDto>(_mapper.ConfigurationProvider)
+.ProjectTo<ActivityDto>(_mapper.ConfigurationProvider , new {currentUsername = _userAccessor.GetUsername()})
                .ToListAsync(cancellation) ;
 
                var activitiesToReturn = _mapper.Map<List<ActivityDto>>(activities); //we are mapping list of activity Dto to activities that is already in our code

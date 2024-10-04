@@ -15,5 +15,12 @@ namespace Application.Profiles
         public string Bio{ get; set; }
 
         public ICollection<Photo> Photos {get ; set ;}
+
+        public bool Following {get ; set ;} // to now if the current logged in user when they return a current user profile is following this particular user profile
+
+        public int FollowersCount {get ; set ; }
+
+        public int FollowingCount {get ; set ;}
+
     }
 }
