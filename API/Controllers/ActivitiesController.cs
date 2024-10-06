@@ -25,12 +25,12 @@ namespace API.Controllers
         // creation of endpoints
         [HttpGet] //api/activities someone how goanna use this route will reach this endpoint
         // now specifying whats going inside the response body 
-        public  async Task<IActionResult> GetActivities() //task returns a list of activities.
+        public  async Task<IActionResult> GetActivities([FromQuery] ActivityParams param) //task returns a list of activities.
         { // the response to the http request is nor then a list from activity 
          // return await Mediator.Send(new List.Query()) ;
 
 
-         return HandleResult( await Mediator.Send(new List.Query()) ) ; //know we are carrying about the errorhandling
+         return HandlePagedResult( await Mediator.Send(new List.Query{Params = param}) ) ; //sending from the clients the desired paging params
 
 
         } //our API controller is sending a request via our go between mediator to our application project, then we are returning the list to the API via also this mediator, all in one

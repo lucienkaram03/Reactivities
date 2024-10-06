@@ -1,11 +1,16 @@
-import { Grid } from 'semantic-ui-react';
+import { Grid, Loader } from 'semantic-ui-react';
 
-import { useEffect } from 'react';
-import LoadingComponent from '../../../app/layout/LoadingComponents';
+import { useEffect, useState } from 'react';
+
 import { useStore } from "../../../app/stores/store";
 
+import { observer } from 'mobx-react-lite';
+import InfiniteScroll from 'react-infinite-scroller';
+import { PagingParams } from '../../../app/models/pagination';
 import ActivityFilters from './ActivityFilters';
 import ActivityList from './ActivityList';
+
+import ActivityListItemPlaceholder from './ActivityListItemPlaceholder';
 
 //ACTIVITY DASHBOARD IS THE HOLE BODY CONTENT OF THE WEB APPLICATION THAT CONTAIN EVERYTHING: LIST , DETAILS, FORMS, BUTTONS
 //interface Props {
@@ -21,22 +26,55 @@ import ActivityList from './ActivityList';
     //submitting : boolean;
 
 //}
-export default function ActivityDashboard(/*{activities, /*selectedActivity, */ /*submitting,*/
+export default observer(function ActivityDashboard(/*{activities, /*selectedActivity, */ /*submitting,*/
    /* selectActivity, cancelSelectActivity */ /*editMode*/ /*openForm,closeForm*/ /*createorEdit*/ /*deleteActivity } : Props*/) { 
 
     
 
     const {activityStore} = useStore ();
-    const{loadActivities, activityRegistry} = activityStore; //destructiuring the edit mode and selected activity from the activityStore mobx class, like we are retreiving them , to make them easy to use
+    const{loadActivities, activityRegistry , setPagingParams , pagination} = activityStore; //destructiuring the edit mode and selected activity from the activityStore mobx class, like we are retreiving them , to make them easy to use
+    const[loadingNext , setLoadingNext ] = useState(false) ;
+
+
+function handleGetNext()  { //this one is used to made a vertical paging. we are working on the sequence of the page
+
+  setLoadingNext(true) ;
+  setPagingParams(new PagingParams(pagination!.currentPage + 1))
+  loadActivities().then(() => setLoadingNext(false)) ;
+
+}
+
     useEffect(() => {
       if(activityRegistry.size <=1) loadActivities(); //thus, we dont need to go to our API, as our activity registry is not empty, so we dont have a loading initial
     }, [activityRegistry.size, loadActivities])
    
 
-    if(activityStore.loadingInitial) return <LoadingComponent content='Loading activities...' />
+    
     return (
           <Grid>
             <Grid.Column width='10'>
+              {activityStore.loadingInitial && activityRegistry.size === 0  && !loadingNext ? (
+                <>
+                <ActivityListItemPlaceholder />
+                <ActivityListItemPlaceholder />
+
+                </>
+              ) : ( //else where we are not loading initial and we are loading the next pach of activities, we infinite scroll
+
+                <InfiniteScroll
+pageStart={0}
+loadMore={handleGetNext}
+hasMore={!loadingNext && !!pagination && pagination.currentPage < pagination.totalPages}
+initialLoad={false}
+>
+
+<ActivityList />
+
+</InfiniteScroll>
+
+
+
+              )} 
 
 
           {/* <List>
@@ -48,12 +86,23 @@ export default function ActivityDashboard(/*{activities, /*selectedActivity, */ 
         ))}
       </List>*/}  
  
-   <ActivityList
+   
 
-    //activities={activities}
-     //selectActivity={selectActivity} 
-     //deleteActivity={deleteActivity}
-    /* submitting = {submitting}*/ /> {/* just by adding this line, we jump into the activityList file which is a child of activity dashboard . So the select activity function we actually need to pass down to our activities list.*/}
+   
+
+
+
+{/* <Button 
+floated='right' 
+content='More ...'
+positive 
+onClick={handleGetNext}
+loading={loadingNext}
+disabled={pagination?.totalPages === pagination?.currentPage} // getting more and more actvivties while cliking on the button 
+/> */}
+
+
+
 
             </Grid.Column>
             <Grid.Column width ='6'>
@@ -62,10 +111,17 @@ export default function ActivityDashboard(/*{activities, /*selectedActivity, */ 
               <ActivityFilters />
               
             </Grid.Column>
+            <Grid.Column width={10} >
+              <Loader active={loadingNext} /> {/* small circle of load when we are scrolling  */}
+            </Grid.Column>
+
+
+
+
           </Grid>
     )
 
-}
+})
 
 
 // we removed this one because we want the card on the right hand side to desappear.

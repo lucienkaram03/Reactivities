@@ -1,10 +1,12 @@
 import { format } from "date-fns";
-import { makeAutoObservable, runInAction } from "mobx";
+import { makeAutoObservable, reaction, runInAction } from "mobx";
 import { v4 as uuid } from 'uuid';
 import agent from "../api/agent";
 import { Activity, ActivityFormValues } from "../models/activity";
 import { Profile } from "../models/profile";
 import { store } from "./store";
+import { Pagination, PagingParams } from "../models/pagination";
+;
 export default class ActivityStore { 
    //activities: Activity[] = [] ;   //this is the list of activities that we are goanna store in our activity store, it is initiazied to an empty array
    activityRegistry = new Map<string , Activity>() ; //we are using now the mapping object, it takes as string which is the id and the activity wich is the object.
@@ -12,7 +14,11 @@ export default class ActivityStore {
    editMode = false;
    loading = false;    //this is a list of observable states.
    loadingInitial = true; // this is the loading logo that we are putting in.
+   pagination : Pagination | null = null ;
+   pagingParams = new PagingParams() ;
+   predicate = new Map().set('all ', true) //all our activities are setted to be filteres, to see which filter is selected by default
    // now we will apply our reduction of codes that we want to from Mobx, replacing the big amount of code concerning the states in the App.tsx code
+
 
 
     constructor() {
@@ -21,10 +27,89 @@ export default class ActivityStore {
             setTitle : action// bounds means that we are bounding this action to the class above, but we can just deal with arrow functions.
         })
     }*/
-         makeAutoObservable(this) //it directly touches the properties ,here title is a property than automatically it is observable
+         makeAutoObservable(this); //it directly touches the properties ,here title is a property than automatically it is observable
      
+         reaction(
+            () => this.predicate.keys() , //when filtering wanna change all the things related to paging, so reaction will take care of this
+            () => { //all the paging params will change
+                this.pagingParams = new PagingParams() ;
+                this.activityRegistry.clear() ;
+                this.loadActivities() ;
+            }
+
+
+
+
+
+
+         )
 
     }
+
+    setPagingParams = (pagingParams : PagingParams) =>  {
+        this.pagingParams= pagingParams ;
+    }
+
+    setPredicate = (predicate : string , value : string | Date) => { //setting the type of our filter
+
+        const resetPredicate = () => { //this method switch up the keys filters apar the date, if we are hosting filter than we reset is going and vice versa
+            this.predicate.forEach((value, key)  => {
+                if(key !== 'StartDate') this.predicate.delete(key) ;
+            })
+        }
+
+        switch (predicate) { //4 types of filter
+            case 'all' :
+                resetPredicate() ;
+                this.predicate.set('all' , true) ;
+                break;
+
+                case 'isGoing' :
+                    resetPredicate() ;
+                    this.predicate.set('isGoing' , true) ;
+                    break;
+                    
+                 case 'isHost' :
+                        resetPredicate() ;
+                        this.predicate.set('isHost' , true) ;
+                        break;   
+
+                 case 'StartDate' :
+                            this.predicate.delete('StartDate')
+                            this.predicate.set('StartDate' , value) ; //the value represent the date which we are filter for
+                            
+
+
+
+        }
+
+    }
+
+
+
+    get axiosParams() {
+        const params = new URLSearchParams() ;
+        params.append('pageNumber' , this.pagingParams.pageNumber.toString()) ;
+        params.append('pageSize' , this.pagingParams.pageSize.toString()) ;
+        this.predicate.forEach((value , key) => {
+
+            if(key === 'StartDate') { //if we have a date filter
+
+                params.append(key , (value as Date).toISOString())
+
+            } else { //we have a normal filter
+                params.append(key , value) ;
+            }
+
+
+        }
+        return params;
+    )
+    }
+
+
+
+
     
     get activitiesByDate() {
         return Array.from(this.activityRegistry.values()).sort((a,b) =>  //.values present all the list of activities
@@ -43,22 +128,21 @@ export default class ActivityStore {
         )
     }
     loadActivities = async () => { // this function loads the activties as we did in the App.tsx with the use of agent.Activities, nut now in the "store" behaviore         ,automatically bounded into the class above, we used async await because we used promises.
-        this.loadingInitial = false; 
+       
         this.loadingInitial = true ; //specifying the ptoperty of the Mobx Class
         
         try {
 
-            const activities = await agent.Activities.list() ; //then we are getting our list of activities from our agent , this is loading activities
-            runInAction(() => {
-
-
-                activities.forEach(activity => {
-                    this.setActivity(activity) ; // instead of writing the code to set the activity in the registry, we created a private set method to do it so
+            const result = await agent.Activities.list() ; //then we are getting our list of activities from our agent , this is loading activities
+                result.data.forEach(result.data => { 
+                    this.setActivity(result.data) ; // instead of writing the code to set the activity in the registry, we created a private set method to do it so
                    
                   }) //we finished feeding our empty array.
+
+                  this.setPagination(result.pagination)
                   this.loadingInitial = false;
 
-            })
+            
            
          } catch (error) {
             console.log(error) ;
@@ -67,6 +151,10 @@ export default class ActivityStore {
             })
             
         }
+    }
+
+    setPagination = (pagination : Pagination) => {
+        this.pagination = pagination ; 
     }
 
     loadActivity = async (id : string) => { //method used to load a single activity from the API when it comes to selecting it

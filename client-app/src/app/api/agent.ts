@@ -2,6 +2,7 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 import { Activity, ActivityFormValues } from '../models/activity';
+import { PaginatedResult } from '../models/pagination';
 import { Photo, Profile } from '../models/profile';
 import { User, UserFormValues } from '../models/user';
 import { router } from '../router/Routes';
@@ -31,6 +32,11 @@ return config;
 axios.interceptors.response.use(async response => { //interceptor is like breakpoints, with async is more beaitiful
     
         await sleep(1000); //wait to sleep for 1000 ms
+        const pagination = response.headers['pagination'] ; //returning the data back as paged form our API as a axios response
+        if (pagination) {
+            response.data = new PaginatedResult(response.data , JSON.parse(pagination));
+            return response as AxiosResponse<PaginatedResult<unknown>> ;
+}
         return response;
     
 }, (error : AxiosError) => { // we are getting back an error from our API
@@ -93,7 +99,8 @@ const requests = { // we are doing a single object for all the crud operations, 
     
 } // <T> we are specifying the type of the instance that we are fetching and getting , this is our generic type, like int 
 const Activities = {
-    list : () => requests.get<Activity[]>('/activities') ,//  this is a request to go and list all the activities, whatever we put in the url it goanna be our base url, and also we will goanna go into our response data.
+    list : (params : URLSearchParams) => axios.get<PaginatedResult<Activity[]>>('/activities' , {params}
+        . then(responseBody)) ,//  this is a request to go and list all the activities, whatever we put in the url it goanna be our base url, and also we will goanna go into our response data.
     // we are precising what is the type of our data that we are frtchig 
     details: (id : string) => requests.get<Activity >(`/activities'/${id}`), //this one is for getting the details when we create an activity and saving it in the server, we are getting an activity with a specific ID
     create:(activity : ActivityFormValues) => requests.post<void>(`/activities` , activity ), //we are sending this activity to the port 5000, 
