@@ -100,10 +100,11 @@ export default class ActivityStore {
             } else { //we have a normal filter
                 params.append(key , value) ;
             }
+            return params;
 
 
         }
-        return params;
+        
     )
     }
 
@@ -133,13 +134,13 @@ export default class ActivityStore {
         
         try {
 
-            const result = await agent.Activities.list() ; //then we are getting our list of activities from our agent , this is loading activities
+            const result = await agent.Activities.list(params) ; //then we are getting our list of activities from our agent , this is loading activities
                 result.data.forEach(result.data => { 
-                    this.setActivity(result.data) ; // instead of writing the code to set the activity in the registry, we created a private set method to do it so
+                    this:this.setActivity(result.data) , // instead of writing the code to set the activity in the registry, we created a private set method to do it so
                    
                   }) //we finished feeding our empty array.
 
-                  this.setPagination(result.pagination)
+                  this.setPagination(result.)
                   this.loadingInitial = false;
 
             

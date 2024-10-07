@@ -20,6 +20,6 @@ namespace API.Extensions
             };
             response.Headers.Append("Pagination" , JsonSerializer.Serialize(paginationHeader)) ; //turning it into json data
             response.Headers.Append("Access-Control-Expose-Headers","Pagination" ) ; //turning it into json data
-        }
+        } 
     }
 }

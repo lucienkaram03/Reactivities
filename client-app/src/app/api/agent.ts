@@ -16,7 +16,7 @@ const sleep = (delay : number) => {
 }
 
 
-axios.defaults.baseURL = 'http://localhost:5000/api/activities'  ;//this is a base url so  that for every request it uses this particular url to search inside
+axios.defaults.baseURL = import.meta.env.VITE_API_URL  ;//this is a base url so  that for every request it uses this particular url to search inside
 
 const responseBody =<T> (response : AxiosResponse<T>) => response.data ; //this responsebody holds the response of data, this is the stuff that we are intersted in.
 axios.interceptors.request.use(config => {
@@ -31,7 +31,7 @@ return config;
 // getting response back from the API,
 axios.interceptors.response.use(async response => { //interceptor is like breakpoints, with async is more beaitiful
     
-        await sleep(1000); //wait to sleep for 1000 ms
+     if(import.meta.env.DEV)   await sleep(1000); //wait to sleep for 1000 ms when we are in developpment mode.
         const pagination = response.headers['pagination'] ; //returning the data back as paged form our API as a axios response
         if (pagination) {
             response.data = new PaginatedResult(response.data , JSON.parse(pagination));

@@ -7,7 +7,7 @@ import { Container } from 'semantic-ui-react';
 //import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
 
 import { useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import HomePage from '../../features/home/HomePage';
 import ModalContainer from '../common/modals/modalContainer';
@@ -161,6 +161,7 @@ if(!commonStore.apploaded) return <LoadingComponent content="Loading app..." />
 
   return( // what the client is really seeing now, 
     <div>
+      <ScrollRestoration />
       <ModalContainer />
       <ToastContainer position = 'bottom-right' hideProgressBar theme ='colored'/>
       {/* we want our toast notification for errors  to be available for every componet, so we will put it in the top */}

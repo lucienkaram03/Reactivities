@@ -16,7 +16,7 @@ export default class CommentStore {
         if(store.activityStore.selectedActivity) { //if our store of activities is not empty
 
             this.hubConnection = new HubConnectionBuilder()
-            .withUrl('http://localhost:5000/chat?activityId='+ activityId, {
+            .withUrl(import.meta.env.VITE_CHAT_URL + '?activityId='+ activityId, { //ensur the connection to the chat server
                 accessTokenFactory:() => store.userStore.user?.token as string  // getting our requests and response (comment sending) via user Tokens
             })
             .withAutomaticReconnect()

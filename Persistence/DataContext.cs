@@ -54,13 +54,13 @@ public DbSet<Photo> Photos {get ; set;} //if we want to get our photo directly f
 
                 b.HasOne(o => o.Observer)
                 .WithMany(f => f.Followings)
-                .HasForeignKey(o => o.Observer) 
+                .HasForeignKey(o => o.ObserverId) 
                 .OnDelete(DeleteBehavior.Cascade); //when deleting a user the following tables of him are deleted also
 
                   b.HasOne(o => o.Target)
                 .WithMany(f => f.Followers)
-                .HasForeignKey(o => o.Target) 
-                .OnDelete(DeleteBehavior.Cascade); //when deleting a user the following tables of him are deleted also
+                .HasForeignKey(o => o.TargetId) 
+                .OnDelete(DeleteBehavior.NoAction); //when deleting a user the following tables of him are deleted also
 
 
             });
