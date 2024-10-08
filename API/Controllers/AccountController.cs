@@ -17,10 +17,15 @@ namespace API.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly TokenService _tokenService;
-        public AccountController(UserManager<AppUser> userManager, TokenService tokenService) //ctro when creating an account controller,it is given a user manager by default
+        private readonly IConfiguration _config;
+
+        private readonly HttpClient _httpClient ;
+        public AccountController(UserManager<AppUser> userManager, TokenService tokenService , IConfiguration config) //ctro when creating an account controller,it is given a user manager by default
         {
+            _config = config;
             _tokenService = tokenService;
             _userManager = userManager; //then we have connection to the database, where -usermanager will be used to fetch the user
+
             
         }
 
@@ -101,6 +106,25 @@ public async Task<ActionResult<UserDto>> GetCurrentUser()
 
 }
 
+
+[AllowAnonymous]
+[HttpPost("fbLogin")]
+
+public async Task<ActionResult<UserDto>> FacebookLogin(string accessToken) 
+{
+    var fbVerifyKeys= _config["Faceboo:AppId"] + "|" + _config["Facebook:AppSecret"]; // adding the app secret and app id in the config file bcz when getting the verfykeys and use them in another task we dont have to write the big codes another time
+
+    var verifyTokenResponse = await  _httpClient .GetAsync($"debug_token?input_token{accessToken}&access_token{fbVerifyKeys}"); //this is will tell if our token is a valid one for our application after we get it from our client. 
+
+
+    if(!verifyTokenResponse.IsSuccessStatusCode) return Unauthorized() ;
+
+   var fbUrl = "me?access_token={accessToken}&fields=name,email,picture.width(100).height(100)" ; 
+
+   var response = await _httpClient.GetFromJsonAsync<dynamic>(fbUrl) ; //getting the infos of the user as JSON into our app user through postman
+
+ return new UserDto() ;
+}
 
 
 private UserDto CreateUserObject(AppUser user) //method to create the properties of a user

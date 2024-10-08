@@ -7,6 +7,7 @@ import { store } from "./store";
 export default class UserStore {
 
     user : User | null = null ;
+    fbLoading = false;
 
     constructor() {
         makeAutoObservable(this) //making ouu user observable
@@ -63,5 +64,35 @@ getUser = async () => {  //we focused on the current user because we are persist
 setImage = (image : string) => {
     if(this.user) this.user.image = image  ;
 }
+
+setUserPhoto =(url : string ) => {
+    if(this.user) this.user.image = url ; 
+}
+
+steDisplayName = (name : string ) => {
+    if (this.user) this.user.displayName = name ; 
+}
+
+facebookLogin = async (accessToken: string) => {
+    try {
+
+        this.fbLoading = true ; 
+        const user = await agent.Account.fbLogin(accessToken) ;
+       store.commonStore.setToken(user.token) //normal thing after we login 
+       
+        runInAction(() => {
+            this.user = user ; 
+            this.fbLoading = false ;
+        })
+
+        
+        
+    } catch (error) {
+        console.log(error) ;
+        runInAction(() => this.fbLoading = false) ;
+        
+    }
+}
+
 
 }

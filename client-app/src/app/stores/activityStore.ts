@@ -142,6 +142,7 @@ export default class ActivityStore {
 
                   this.setPagination(result.)
                   this.loadingInitial = false;
+                    
 
             
            

@@ -99,8 +99,8 @@ const requests = { // we are doing a single object for all the crud operations, 
     
 } // <T> we are specifying the type of the instance that we are fetching and getting , this is our generic type, like int 
 const Activities = {
-    list : (params : URLSearchParams) => axios.get<PaginatedResult<Activity[]>>('/activities' , {params}
-        . then(responseBody)) ,//  this is a request to go and list all the activities, whatever we put in the url it goanna be our base url, and also we will goanna go into our response data.
+    list : (params : URLSearchParams) => axios.get<PaginatedResult<Activity[]>>('/activities' , {params})
+        . then(responseBody) ,//  this is a request to go and list all the activities, whatever we put in the url it goanna be our base url, and also we will goanna go into our response data.
     // we are precising what is the type of our data that we are frtchig 
     details: (id : string) => requests.get<Activity >(`/activities'/${id}`), //this one is for getting the details when we create an activity and saving it in the server, we are getting an activity with a specific ID
     create:(activity : ActivityFormValues) => requests.post<void>(`/activities` , activity ), //we are sending this activity to the port 5000, 
@@ -111,9 +111,11 @@ const Activities = {
 
 const Account = { //our specific method to connect to our API concerning to login , register and get the current user
 
-    current: () => requests.get<User>('/account'), //return type is a user
-    login: (user: UserFormValues) => requests.post<User>('/account/login', user), //this method take as a parameter the values from the form, and from these values it return the user with this info from the url below.
+    current: () => requests.get<User>('/account'), //return type is a user 
+    login: (user: UserFormValues) => requests.post<User>('/account/login', user), //this method take as a parameter the values from the form, and from these values it return the user from the API with this info from the url below.
     register: (user: UserFormValues) => requests.post<User>('/account/register', user), 
+    fbLogin: (accessToken : string ) => 
+        requests.post<User>(`/account/fbLogin?accessToken=${accessToken}`, {}) //this is our flow in one single line of code (steps 2 and 6 )
 
 
 }

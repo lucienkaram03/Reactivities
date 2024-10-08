@@ -27,7 +27,7 @@ services.AddCors(opt => { // this is our policy
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials() // then we ensure connection to signalR with the token required
-    .WithOrigins("http://localhost: 3000");
+    .WithOrigins("http://localhost: 3000"  , "https://localhost:3000");
 
 
 });
